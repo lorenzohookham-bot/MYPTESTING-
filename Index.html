@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Crunch Artisanal Pickles</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka (Playful/Bubbly) & Outfit (Modern UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        // Tailwind Custom Configurations
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        pickle: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                            neon: '#39ff14',
+                        },
+                        chili: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            neon: '#ff2a5f',
+                        },
+                        mustard: {
+                            400: '#facc15',
+                            500: '#eab308',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-reverse': 'floatReverse 7s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2.5s infinite',
+                        'marquee': 'marquee 30s linear infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-16px) rotate(4deg)' },
+                        },
+                        floatReverse: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(16px) rotate(-4deg)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(34, 197, 94, 0.4), inset 0 0 10px rgba(34, 197, 94, 0.2)' },
+                            '50%': { boxShadow: '0 0 40px rgba(57, 255, 20, 0.8), inset 0 0 20px rgba(57, 255, 20, 0.4)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Global Custom Styles */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #080f1e;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-bubbly {
+            font-family: 'Fredoka', cursive;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b132b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #22c55e;
+            border-radius: 9999px;
+        }
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(34, 197, 94, 0.5);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px -10px rgba(34, 197, 94, 0.3);
+        }
+        /* Neon Glow Borders */
+        .neon-border-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+            border: 1px solid rgba(34, 197, 94, 0.6);
+        }
+        .neon-border-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+            border: 1px solid rgba(239, 68, 68, 0.6);
+        }
+        .neon-border-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+            border: 1px solid rgba(245, 158, 11, 0.6);
+        }
+        /* Page Transition classes */
+        .page-content {
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        .page-hidden {
+            opacity: 0;
+            transform: translateY(15px);
+            pointer-events: none;
+            display: none !important;
+        }
+        .page-active {
+            opacity: 1;
+            transform: translateY(0);
+            display: block !important;
+        }
+        /* Interactive 3D tilt card setup */
+        .tilt-card-container {
+            perspective: 1000px;
+        }
+        .tilt-card-inner {
+            transition: transform 0.15s ease-out;
+            transform-style: preserve-3d;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen selection:bg-pickle-500 selection:text-slate-950">
+
+    <!-- Canvas Particle Motion Graphic Background -->
+    <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-80"></canvas>
+
+    <!-- Main Outer Container -->
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+        <!-- Top Announcement Bar -->
+        <div class="bg-gradient-to-r from-pickle-700 via-chili-600 to-mustard-500 text-slate-950 font-semibold py-1.5 px-4 text-xs md:text-sm text-center flex items-center justify-center gap-2 shadow-lg">
+            <span class="inline-block animate-bounce">🥒</span>
+            <span>FREE Cosmic Express Shipping on all orders over $35! Use code <strong class="bg-slate-950 text-pickle-neon px-2 py-0.5 rounded font-mono text-xs">DILL10</strong> for 10% off</span>
+            <span class="inline-block animate-bounce">✨</span>
+        </div>
+
+        <!-- Sticky Floating Header / Navigation Bar -->
+        <header class="sticky top-4 z-40 px-4 md:px-8 max-w-7xl mx-auto w-full my-2">
+            <nav class="glass-panel rounded-full px-4 py-3 md:px-6 flex items-center justify-between shadow-2xl transition-all border border-white/10">
+                <!-- Brand Logo & Name -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('page1')">
+                    <div class="w-10 h-10 md:w-11 md:h-11 rounded-full bg-gradient-to-tr from-pickle-600 to-pickle-neon flex items-center justify-center text-2xl shadow-lg shadow-pickle-500/30 animate-pulse-glow">
+                        🥒
+                    </div>
+                    <div>
+                        <span class="font-bubbly text-xl md:text-2xl font-bold bg-gradient-to-r from-pickle-400 via-yellow-300 to-chili-neon bg-clip-text text-transparent leading-none block">
+                            Cosmic Crunch
+                        </span>
+                        <span class="text-[10px] md:text-xs text-pickle-400 font-medium tracking-widest uppercase block -mt-1">
+                            Artisanal Pickles
+                        </span>
+                    </div>
+                </div>
+
+                <!-- SPA Page Navigation Tabs -->
+                <div class="flex items-center gap-1 md:gap-2 bg-slate-900/80 p-1.5 rounded-full border border-slate-700/60">
+                    <button id="navTab1" onclick="switchPage('page1')" class="px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-gradient-to-r from-pickle-500 to-pickle-600 text-slate-950 shadow-md font-bold">
+                        <span>🏬</span>
+                        <span class="hidden sm:inline">Store Showcase</span>
+                    </button>
+                    <button id="navTab2" onclick="switchPage('page2')" class="px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800">
+                        <span>🧪</span>
+                        <span class="hidden sm:inline">Custom Jar Lab</span>
+                    </button>
+                </div>
+
+                <!-- Action Controls: Audio Toggle & Cart Button -->
+                <div class="flex items-center gap-2 md:gap-3">
+                    <!-- Audio FX Synth Sound Toggle -->
+                    <button id="audioToggleBtn" onclick="toggleAudio()" class="w-9 h-9 rounded-full bg-slate-800/90 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-pickle-400 transition-colors" title="Toggle Sound Effects">
+                        <span id="audioIcon">🔊</span>
+                    </button>
+
+                    <!-- Cart Drawer Trigger Button -->
+                    <button onclick="toggleCartDrawer()" class="relative bg-gradient-to-r from-chili-600 to-chili-neon hover:from-chili-500 hover:to-chili-600 text-white font-bubbly text-xs md:text-sm px-4 py-2.5 rounded-full flex items-center gap-2 shadow-lg shadow-chili-500/25 transition-transform active:scale-95">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        <span class="hidden xs:inline">Cart</span>
+                        <span id="cartBadge" class="bg-slate-950 text-pickle-neon font-bold text-xs px-2 py-0.5 rounded-full border border-pickle-500">0</span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- MAIN CONTENT SPA AREA -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 md:px-8 py-6">
+
+            <!-- PAGE 1: STORE FRONT / HOME SHOWCASE -->
+            <section id="page1" class="page-content page-active space-y-16">
+
+                <!-- Hero Section with Animated Liquid Accent & 3D Tilt Display -->
+                <div class="relative rounded-3xl overflow-hidden glass-panel p-6 md:p-12 border border-white/10 shadow-2xl">
+                    <!-- Background Glow Orbs -->
+                    <div class="absolute -top-24 -left-24 w-96 h-96 bg-pickle-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-chili-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-mustard-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                        <!-- Hero Left Text Content -->
+                        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pickle-900/60 border border-pickle-500/40 text-pickle-400 text-xs md:text-sm font-semibold tracking-wide">
+                                <span class="w-2 h-2 rounded-full bg-pickle-neon animate-ping"></span>
+                                🚀 HAND-BATCHED IN ASTRONOMICAL BRINE
+                            </div>
+
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-white">
+                                Cosmic Crunch <br/>
+                                <span class="bg-gradient-to-r from-pickle-400 via-mustard-400 to-chili-neon bg-clip-text text-transparent">
+                                    Out-Of-This-World
+                                </span> <br/>
+                                Pickle Perfection.
+                            </h1>
+
+                            <p class="text-slate-300 text-base md:text-lg max-w-2xl leading-relaxed">
+                                Sourced from organic sun-drenched farms, bathed in small-batch secret herb infusions, and sealed in glass for the ultimate crisp, explosive crunch in every single bite.
+                            </p>
+
+                            <!-- Hero Action Buttons -->
+                            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                                <a href="#flavorCatalog" onclick="playSynthSound('pop')" class="bg-gradient-to-r from-pickle-500 to-pickle-600 hover:from-pickle-400 hover:to-pickle-500 text-slate-950 font-bubbly text-base px-7 py-3.5 rounded-2xl shadow-xl shadow-pickle-500/25 transition-all transform hover:-translate-y-1 active:translate-y-0 font-bold flex items-center gap-2">
+                                    <span>🌶️ Explore Flavors</span>
+                                </a>
+                                <button onclick="switchPage('page2'); playSynthSound('pop');" class="glass-card hover:bg-slate-800 text-white border border-pickle-400/30 hover:border-pickle-400 font-bubbly text-base px-7 py-3.5 rounded-2xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center gap-2">
+                                    <span>🧪 Custom Jar Lab</span>
+                                </button>
+                            </div>
+
+                            <!-- Stat Counters -->
+                            <div class="grid grid-cols-3 gap-3 md:gap-6 pt-6 border-t border-slate-800">
+                                <div class="bg-slate-900/50 p-3 rounded-2xl border border-white/5 text-center lg:text-left">
+                                    <div class="text-2xl md:text-3xl font-bubbly text-pickle-400 font-bold">120K+</div>
+                                    <div class="text-xs text-slate-400">Jars Shipped</div>
+                                </div>
+                                <div class="bg-slate-900/50 p-3 rounded-2xl border border-white/5 text-center lg:text-left">
+                                    <div class="text-2xl md:text-3xl font-bubbly text-mustard-400 font-bold">4.9 ★</div>
+                                    <div class="text-xs text-slate-400">15,000+ Reviews</div>
+                                </div>
+                                <div class="bg-slate-900/50 p-3 rounded-2xl border border-white/5 text-center lg:text-left">
+                                    <div class="text-2xl md:text-3xl font-bubbly text-chili-neon font-bold">100%</div>
+                                    <div class="text-xs text-slate-400">Organic Crunch</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hero Right Interactive 3D Tilt Pickle Jar Showcase -->
+                        <div class="lg:col-span-5 flex justify-center tilt-card-container">
+                            <div id="heroJarCard" class="tilt-card-inner relative w-full max-w-sm glass-card rounded-3xl p-6 border border-pickle-500/40 text-center flex flex-col items-center justify-center shadow-2xl animate-float">
+                                <!-- Floating Badge -->
+                                <div class="absolute -top-3 -right-3 bg-gradient-to-r from-chili-600 to-chili-neon text-white font-bubbly text-xs uppercase font-bold px-3 py-1 rounded-full shadow-lg border border-white/20 animate-pulse">
+                                    🔥 #1 Best Seller
+                                </div>
+
+                                <!-- Jar Graphic Canvas Container -->
+                                <div class="relative w-64 h-72 my-2 flex items-center justify-center">
+                                    <canvas id="heroJarCanvas" width="260" height="295" class="drop-shadow-[0_20px_25px_rgba(34,197,94,0.35)]"></canvas>
+                                </div>
+
+                                <div class="mt-2 space-y-1">
+                                    <h3 class="text-2xl font-bubbly font-bold text-white">Spicy Garlic Inferno</h3>
+                                    <p class="text-xs text-slate-300">Habenero Infused • Extra Crunchy Spears</p>
+                                    <div class="flex items-center justify-center gap-1 text-sm text-mustard-400 pt-1">
+                                        ★★★★★ <span class="text-xs text-slate-400 ml-1">(4,820)</span>
+                                    </div>
+                                </div>
+
+                                <button onclick="addToCart(1); playSynthSound('crunch');" class="mt-5 w-full bg-gradient-to-r from-pickle-500 to-pickle-600 hover:from-pickle-400 hover:to-pickle-500 text-slate-950 font-bubbly py-3 rounded-xl font-bold shadow-lg shadow-pickle-500/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <span>🛒 Add To Cart</span>
+                                    <span>•</span>
+                                    <span>$12.99</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pickle Catalog Filter & Live Search Section -->
+                <div id="flavorCatalog" class="space-y-8 pt-4">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl md:text-4xl font-bubbly font-bold text-white flex items-center gap-3">
+                                <span>🥒 Galactic Pickle Catalog</span>
+                            </h2>
+                            <p class="text-slate-400 text-sm">Filter by heat index, spice levels, or search flavor profiles</p>
+                        </div>
+
+                        <!-- Live Search Input -->
+                        <div class="relative w-full md:w-72">
+                            <input type="text" id="searchInput" oninput="filterPickles()" placeholder="Search flavor or ingredient..." class="w-full bg-slate-900/90 border border-slate-700 focus:border-pickle-500 rounded-2xl px-4 py-2.5 pl-10 text-sm text-white placeholder-slate-500 outline-none transition-all shadow-inner">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Filter Pill Toggles -->
+                    <div class="flex flex-wrap items-center gap-2 pb-2 border-b border-slate-800">
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold mr-2">Spice Index:</span>
+                        <button onclick="setFilter('all')" id="filterBtn-all" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-pickle-500 text-slate-950 shadow-md">All Jars</button>
+                        <button onclick="setFilter('mild')" id="filterBtn-mild" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">🌱 Mild & Dill</button>
+                        <button onclick="setFilter('medium')" id="filterBtn-medium" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">⚡ Medium Kick</button>
+                        <button onclick="setFilter('hot')" id="filterBtn-hot" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">🔥 Hot Jalapeño</button>
+                        <button onclick="setFilter('inferno')" id="filterBtn-inferno" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">💀 Ghost Inferno</button>
+                    </div>
+
+                    <!-- Dynamic Catalog Grid -->
+                    <div id="pickleGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Customer Review Motion Marquee Ticker -->
+                <div class="space-y-6 pt-6">
+                    <div class="text-center space-y-2">
+                        <h2 class="text-2xl md:text-3xl font-bubbly font-bold text-white">Loved By Pickle Fanatics Everywhere</h2>
+                        <p class="text-slate-400 text-sm">Real reviews from verified Cosmic Crunch lovers</p>
+                    </div>
+
+                    <div class="relative overflow-hidden w-full py-4 mask-gradient">
+                        <div class="flex gap-4 animate-marquee w-max">
+                            <!-- Duplicate cards for smooth infinite loop -->
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-pickle-600 flex items-center justify-center font-bold text-white">DJ</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Dave J.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"The Spicy Garlic Inferno is literally life changing. Perfect crunch level and the garlic brine is heavenly!"</p>
+                            </div>
+
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-chili-600 flex items-center justify-center font-bold text-white">SK</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Sarah K.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"Honey Dill Delight on a turkey sandwich is unbelievable. Fast shipping, super safe eco-friendly packaging!"</p>
+                            </div>
+
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-mustard-500 text-slate-950 flex items-center justify-center font-bold">MB</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Marcus B.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"The Custom Jar Builder is so cool! I made a double-garlic habanero batch and my whole family devoured it."</p>
+                            </div>
+
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white">EL</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Elena L.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"Electric Bread & Butter pickles are sweet, tangy and snap loudly when you bite in. 10/10 recommended!"</p>
+                            </div>
+
+                            <!-- Duplicated items for infinite seamless scroll -->
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-pickle-600 flex items-center justify-center font-bold text-white">DJ</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Dave J.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"The Spicy Garlic Inferno is literally life changing. Perfect crunch level and the garlic brine is heavenly!"</p>
+                            </div>
+
+                            <div class="glass-card w-80 p-5 rounded-2xl border border-slate-800 flex-shrink-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-full bg-chili-600 flex items-center justify-center font-bold text-white">SK</div>
+                                    <div>
+                                        <div class="font-bold text-sm text-white">Sarah K.</div>
+                                        <div class="text-xs text-mustard-400">★★★★★ Verified Buyer</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">"Honey Dill Delight on a turkey sandwich is unbelievable. Fast shipping, super safe eco-friendly packaging!"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- PAGE 2: CUSTOM PICKLE JAR BUILDER LAB -->
+            <section id="page2" class="page-content page-hidden space-y-8">
+                <div class="text-center space-y-2 max-w-2xl mx-auto">
+                    <div class="inline-block px-3 py-1 rounded-full bg-pickle-900/80 border border-pickle-500/40 text-pickle-400 text-xs font-semibold">
+                        🧪 COSMIC LABS
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-bubbly font-bold text-white">Build Your Custom Pickle Jar</h2>
+                    <p class="text-slate-300 text-sm md:text-base">Mix brine bases, select crunch factor, add custom extra spices, and render your custom printed label live!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <!-- Left Column: Customizer Controls Form -->
+                    <div class="lg:col-span-7 glass-panel rounded-3xl p-6 md:p-8 space-y-6 border border-white/10 shadow-2xl">
+                        
+                        <!-- Step 1: Jar Size -->
+                        <div class="space-y-3">
+                            <label class="block font-bubbly text-base font-bold text-pickle-400 flex items-center gap-2">
+                                <span>1. Select Jar Capacity</span>
+                            </label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="selectJarSize('8oz', 9.99)" id="sizeBtn-8oz" class="size-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 text-center hover:border-pickle-500 transition-all">
+                                    <div class="font-bubbly text-base text-white">8 oz</div>
+                                    <div class="text-xs text-slate-400">Snack Size</div>
+                                    <div class="text-xs font-bold text-pickle-400 mt-1">$9.99</div>
+                                </button>
+                                <button onclick="selectJarSize('16oz', 13.99)" id="sizeBtn-16oz" class="size-btn p-3 rounded-2xl bg-pickle-900/60 border-2 border-pickle-500 text-center transition-all shadow-md">
+                                    <div class="font-bubbly text-base text-white">16 oz</div>
+                                    <div class="text-xs text-slate-300">Standard Jar</div>
+                                    <div class="text-xs font-bold text-pickle-400 mt-1">$13.99</div>
+                                </button>
+                                <button onclick="selectJarSize('32oz', 19.99)" id="sizeBtn-32oz" class="size-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 text-center hover:border-pickle-500 transition-all">
+                                    <div class="font-bubbly text-base text-white">32 oz</div>
+                                    <div class="text-xs text-slate-400">Mega Crunch</div>
+                                    <div class="text-xs font-bold text-pickle-400 mt-1">$19.99</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Brine Base & Color Profile -->
+                        <div class="space-y-3">
+                            <label class="block font-bubbly text-base font-bold text-pickle-400">
+                                2. Choose Brine Base Infusion
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <button onclick="selectBrine('dill', '#10b981')" id="brineBtn-dill" class="brine-btn p-3 rounded-2xl bg-emerald-950/80 border-2 border-emerald-500 text-center transition-all">
+                                    <div class="w-6 h-6 rounded-full bg-emerald-500 mx-auto mb-1.5 shadow-md"></div>
+                                    <div class="font-bubbly text-xs text-white">Classic Dill</div>
+                                </button>
+                                <button onclick="selectBrine('spicy', '#ef4444')" id="brineBtn-spicy" class="brine-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-chili-500 text-center transition-all">
+                                    <div class="w-6 h-6 rounded-full bg-chili-500 mx-auto mb-1.5 shadow-md"></div>
+                                    <div class="font-bubbly text-xs text-white">Fiery Chili</div>
+                                </button>
+                                <button onclick="selectBrine('sweet', '#f59e0b')" id="brineBtn-sweet" class="brine-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-mustard-500 text-center transition-all">
+                                    <div class="w-6 h-6 rounded-full bg-mustard-500 mx-auto mb-1.5 shadow-md"></div>
+                                    <div class="font-bubbly text-xs text-white">Honey Sweet</div>
+                                </button>
+                                <button onclick="selectBrine('smoky', '#b45309')" id="brineBtn-smoky" class="brine-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-amber-600 text-center transition-all">
+                                    <div class="w-6 h-6 rounded-full bg-amber-700 mx-auto mb-1.5 shadow-md"></div>
+                                    <div class="font-bubbly text-xs text-white">Smoky Bourbon</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Extra Mix-in Ingredients -->
+                        <div class="space-y-3">
+                            <label class="block font-bubbly text-base font-bold text-pickle-400">
+                                3. Extra Spice & Herb Floating Mix-ins (+$1.00 each)
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <label class="glass-card p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 border border-slate-700">
+                                    <input type="checkbox" id="chk-garlic" onchange="updateCustomJar()" class="w-4 h-4 accent-pickle-500 rounded">
+                                    <span class="text-xs font-semibold text-white">🧄 Whole Garlic</span>
+                                </label>
+                                <label class="glass-card p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 border border-slate-700">
+                                    <input type="checkbox" id="chk-chili" onchange="updateCustomJar()" class="w-4 h-4 accent-pickle-500 rounded" checked>
+                                    <span class="text-xs font-semibold text-white">🌶️ Habanero Flakes</span>
+                                </label>
+                                <label class="glass-card p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 border border-slate-700">
+                                    <input type="checkbox" id="chk-dill" onchange="updateCustomJar()" class="w-4 h-4 accent-pickle-500 rounded" checked>
+                                    <span class="text-xs font-semibold text-white">🌿 Fresh Dill Sprigs</span>
+                                </label>
+                                <label class="glass-card p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 border border-slate-700">
+                                    <input type="checkbox" id="chk-mustard" onchange="updateCustomJar()" class="w-4 h-4 accent-pickle-500 rounded">
+                                    <span class="text-xs font-semibold text-white">🟡 Mustard Seeds</span>
+                                </label>
+                                <label class="glass-card p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 border border-slate-700">
+                                    <input type="checkbox" id="chk-peppercorn" onchange="updateCustomJar()" class="w-4 h-4 accent-pickle-500 rounded">
+                                    <span class="text-xs font-semibold text-white">⚫ Black Peppercorn</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Custom Printed Label Text -->
+                        <div class="space-y-2">
+                            <label class="block font-bubbly text-base font-bold text-pickle-400">
+                                4. Printed Custom Jar Label Text
+                            </label>
+                            <input type="text" id="customLabelInput" maxlength="22" oninput="updateCustomJar()" value="Cosmic Masterpiece" class="w-full bg-slate-900 border border-slate-700 focus:border-pickle-500 rounded-2xl px-4 py-3 text-sm text-white font-bubbly placeholder-slate-500 outline-none transition-all shadow-inner">
+                            <span class="text-[11px] text-slate-400">Max 22 characters. Prints directly onto the jar canvas!</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Live Rendered Canvas Jar Preview & Checkout Button -->
+                    <div class="lg:col-span-5 glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col items-center justify-between sticky top-28 space-y-6">
+                        <div class="text-center">
+                            <span class="text-xs uppercase font-bold tracking-widest text-pickle-400">Live Preview</span>
+                            <h3 class="text-2xl font-bubbly font-bold text-white">Your Custom Jar</h3>
+                        </div>
+
+                        <!-- Canvas Live Interactive Jar Preview -->
+                        <div class="relative w-full flex items-center justify-center py-2">
+                            <canvas id="customJarCanvas" width="300" height="340" class="drop-shadow-[0_20px_30px_rgba(34,197,94,0.3)]"></canvas>
+                        </div>
+
+                        <!-- Price summary calculation -->
+                        <div class="w-full bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-2">
+                            <div class="flex justify-between text-xs text-slate-300">
+                                <span>Base Jar (<span id="summarySize">16oz</span>):</span>
+                                <span id="summaryBasePrice">$13.99</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-300">
+                                <span>Extra Mix-ins:</span>
+                                <span id="summaryExtrasPrice">$1.00</span>
+                            </div>
+                            <div class="border-t border-slate-800 pt-2 flex justify-between font-bubbly text-lg text-white font-bold">
+                                <span>Total Price:</span>
+                                <span id="summaryTotalPrice" class="text-pickle-400">$14.99</span>
+                            </div>
+                        </div>
+
+                        <!-- Add Custom Batch to Cart Button -->
+                        <button onclick="addCustomJarToCart()" class="w-full bg-gradient-to-r from-pickle-500 via-pickle-400 to-pickle-600 hover:from-pickle-400 hover:to-pickle-500 text-slate-950 font-bubbly text-lg py-4 rounded-2xl font-bold shadow-xl shadow-pickle-500/25 active:scale-95 transition-all flex items-center justify-center gap-2">
+                            <span>✨ Add Custom Batch To Cart</span>
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-20 border-t border-slate-800 bg-slate-950/80 py-10 px-4 text-center text-xs text-slate-500">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">🥒</span>
+                    <span class="font-bubbly text-white font-bold">Cosmic Crunch Artisanal Pickles</span>
+                </div>
+                <p>© 2026 Cosmic Crunch Inc. Handcrafted with love & fresh dill sprigs.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-pickle-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-pickle-400 transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-pickle-400 transition-colors">Contact Pickle HQ</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- CART SLIDE-OVER DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0">
+        <!-- Backdrop overlay -->
+        <div id="cartBackdrop" onclick="toggleCartDrawer()" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm cursor-pointer"></div>
+
+        <!-- Slide Drawer Panel -->
+        <div id="cartPanel" class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-slate-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
+            <div>
+                <!-- Cart Header -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🛒</span>
+                        <h3 class="font-bubbly text-xl font-bold text-white">Your Pickle Jar Cart</h3>
+                    </div>
+                    <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+                </div>
+
+                <!-- Cart Items List Container -->
+                <div id="cartItemsList" class="py-4 space-y-3 max-h-[55vh] overflow-y-auto">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Cart Summary & Checkout Footer -->
+            <div class="border-t border-slate-800 pt-4 space-y-4">
+                <!-- Promo Code Box -->
+                <div class="flex gap-2">
+                    <input type="text" id="promoInput" placeholder="Promo code (e.g. DILL10)" class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white uppercase outline-none focus:border-pickle-500">
+                    <button onclick="applyPromoCode()" class="bg-slate-800 hover:bg-slate-700 text-pickle-400 font-bubbly text-xs px-4 py-2 rounded-xl transition-colors">Apply</button>
+                </div>
+
+                <div class="space-y-1.5 text-xs text-slate-300">
+                    <div class="flex justify-between">
+                        <span>Subtotal</span>
+                        <span id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-pickle-400">
+                        <span>Discount</span>
+                        <span id="cartDiscount">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Estimated Shipping</span>
+                        <span id="cartShipping">FREE</span>
+                    </div>
+                    <div class="flex justify-between font-bubbly text-base text-white font-bold border-t border-slate-800 pt-2">
+                        <span>Grand Total</span>
+                        <span id="cartTotal" class="text-pickle-400">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-pickle-500 via-pickle-400 to-pickle-600 text-slate-950 font-bubbly text-base py-3.5 rounded-2xl font-bold shadow-lg shadow-pickle-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <span>🚀 Proceed to Checkout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT & CONFETTI SUCCESS MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-8 border border-pickle-500/30 shadow-2xl relative">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+
+            <!-- Step A: Checkout Form -->
+            <div id="checkoutFormStep" class="space-y-6">
+                <div class="text-center space-y-1">
+                    <span class="text-3xl">📦</span>
+                    <h3 class="text-2xl font-bubbly font-bold text-white">Complete Your Cosmic Order</h3>
+                    <p class="text-xs text-slate-400">Enter delivery information for fast artisanal shipping</p>
+                </div>
+
+                <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">Full Name</label>
+                        <input type="text" required placeholder="Pickle Enthusiast" class="w-full bg-slate-900 border border-slate-700 focus:border-pickle-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">Shipping Address</label>
+                        <input type="text" required placeholder="123 Crunch Lane, Jar City" class="w-full bg-slate-900 border border-slate-700 focus:border-pickle-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1 font-semibold">Card Number</label>
+                            <input type="text" required placeholder="4242 •••• •••• 4242" class="w-full bg-slate-900 border border-slate-700 focus:border-pickle-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1 font-semibold">EXP / CVC</label>
+                            <input type="text" required placeholder="MM/YY 123" class="w-full bg-slate-900 border border-slate-700 focus:border-pickle-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between text-xs text-white font-bubbly font-bold">
+                        <span>Total Due Today:</span>
+                        <span id="checkoutModalTotal" class="text-pickle-400">$0.00</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-pickle-500 to-pickle-600 hover:from-pickle-400 hover:to-pickle-500 text-slate-950 font-bubbly text-base py-3.5 rounded-2xl font-bold shadow-lg shadow-pickle-500/25 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <span>✨ Place Order Now</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step B: Order Complete Celebration -->
+            <div id="checkoutSuccessStep" class="hidden text-center space-y-6 py-4">
+                <div class="w-20 h-20 rounded-full bg-pickle-500/20 text-pickle-400 text-4xl flex items-center justify-center mx-auto border border-pickle-500 animate-bounce">
+                    🎉
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-3xl font-bubbly font-bold text-white">Order Confirmed!</h3>
+                    <p class="text-xs text-slate-300 max-w-xs mx-auto">Your artisanal pickle jars are being hand-packed and sealed in our cosmic kitchen!</p>
+                </div>
+
+                <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 text-left space-y-2 text-xs">
+                    <div class="flex justify-between text-slate-400">
+                        <span>Order Number:</span>
+                        <span id="orderNumberCode" class="text-pickle-400 font-mono font-bold">#CC-84920</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Est. Delivery:</span>
+                        <span class="text-white">2-3 Business Days</span>
+                    </div>
+                </div>
+
+                <button onclick="finishOrderAndReset()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bubbly text-sm py-3 rounded-xl transition-colors">
+                    Back To Store
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        /* -------------------------------------------------------------
+           1. CATALOG & PRODUCTS DATA
+        ------------------------------------------------------------- */
+        const PRODUCTS = [
+            {
+                id: 1,
+                name: "Spicy Garlic Inferno",
+                tagline: "Habanero Infused • Extra Crunchy",
+                category: "hot",
+                price: 12.99,
+                rating: 4.9,
+                reviews: 4820,
+                badge: "BEST SELLER",
+                badgeColor: "bg-chili-600",
+                spiceLevel: 4, // 1 to 5
+                crunchFactor: 95,
+                color: "#ef4444",
+                desc: "Steeped in crushed garlic cloves, fresh habanero peppers, and sea salt. Packs a thrilling garlic burn!"
+            },
+            {
+                id: 2,
+                name: "Honey Dill Delight",
+                tagline: "Sweet Blossom Honey • Fresh Dill",
+                category: "mild",
+                price: 11.99,
+                rating: 4.8,
+                reviews: 2150,
+                badge: "FAN FAVORITE",
+                badgeColor: "bg-mustard-500 text-slate-950",
+                spiceLevel: 1,
+                crunchFactor: 88,
+                color: "#f59e0b",
+                desc: "Infused with pure wildflower honey and hand-picked fresh dill sprigs for a smooth, sweet bite."
+            },
+            {
+                id: 3,
+                name: "Smoky Jalapeño Blast",
+                tagline: "Smoked Paprika • Fire Jalapeño",
+                category: "medium",
+                price: 13.49,
+                rating: 4.9,
+                reviews: 1890,
+                badge: "NEW INFUSION",
+                badgeColor: "bg-pickle-600",
+                spiceLevel: 3,
+                crunchFactor: 92,
+                color: "#d97706",
+                desc: "Oak-smoked hickory salt blended with thick-cut jalapeño coins and peppercorns."
+            },
+            {
+                id: 4,
+                name: "Electric Bread & Butter",
+                tagline: "Sweet & Tangy • Neon Zest",
+                category: "mild",
+                price: 10.99,
+                rating: 4.7,
+                reviews: 1340,
+                badge: "CLASSIC",
+                badgeColor: "bg-slate-700",
+                spiceLevel: 1,
+                crunchFactor: 85,
+                color: "#84cc16",
+                desc: "Old-school grand-style recipe with turmeric, yellow mustard seeds, and onion slice rings."
+            },
+            {
+                id: 5,
+                name: "Ghost Pepper Neon Crunch",
+                tagline: "Extreme Heat • 1,000,000 Scoville",
+                category: "inferno",
+                price: 14.99,
+                rating: 5.0,
+                reviews: 3100,
+                badge: "HOTTEST EVER",
+                badgeColor: "bg-gradient-to-r from-red-600 to-pink-600",
+                spiceLevel: 5,
+                crunchFactor: 98,
+                color: "#ff2a5f",
+                desc: "Daredevil level spice! Pure ghost pepper puree and fiery habanero oil for intense thrill seekers."
+            },
+            {
+                id: 6,
+                name: "Cosmic Garlic Sour",
+                tagline: "Double Garlic • Crisp Sour Brine",
+                category: "medium",
+                price: 12.49,
+                rating: 4.8,
+                reviews: 980,
+                badge: "LIMITED",
+                badgeColor: "bg-purple-600",
+                spiceLevel: 2,
+                crunchFactor: 90,
+                color: "#10b981",
+                desc: "Traditional sour fermentation with twice the garlic and fresh dill sprigs for ultra tangy crunch."
+            }
+        ];
+
+        /* -------------------------------------------------------------
+           2. APP STATE MANAGEMENT
+        ------------------------------------------------------------- */
+        let state = {
+            activePage: 'page1',
+            cart: [],
+            appliedPromo: null,
+            audioEnabled: true,
+            filterCategory: 'all',
+            searchQuery: '',
+            customJar: {
+                size: '16oz',
+                basePrice: 13.99,
+                brineType: 'dill',
+                brineColor: '#10b981',
+                extras: ['chk-chili', 'chk-dill'],
+                label: 'Cosmic Masterpiece'
+            }
+        };
+
+        /* -------------------------------------------------------------
+           3. WEB AUDIO SYNTHESIZER (NO EXTERNAL AUDIO FILES NEEDED)
+        ------------------------------------------------------------- */
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSynthSound(type) {
+            if (!state.audioEnabled) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (type === 'pop') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'crunch') {
+                    // Crunch sound synthesis using noise buffer
+                    const bufferSize = audioCtx.sampleRate * 0.12;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1200;
+                    filter.Q.value = 3;
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    noise.start();
+                } else if (type === 'chime') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = freq;
+                        const startTime = audioCtx.currentTime + (idx * 0.08);
+                        gain.gain.setValueAtTime(0.2, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.3);
+                    });
+                }
+            } catch(e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        function toggleAudio() {
+            state.audioEnabled = !state.audioEnabled;
+            document.getElementById('audioIcon').innerText = state.audioEnabled ? '🔊' : '🔇';
+            showToast(state.audioEnabled ? 'Audio Sound Effects ON' : 'Audio Muted', 'info');
+        }
+
+        /* -------------------------------------------------------------
+           4. PAGE NAVIGATION & SPA ROUTING
+        ------------------------------------------------------------- */
+        function switchPage(pageId) {
+            state.activePage = pageId;
+            const p1 = document.getElementById('page1');
+            const p2 = document.getElementById('page2');
+            const tab1 = document.getElementById('navTab1');
+            const tab2 = document.getElementById('navTab2');
+
+            playSynthSound('pop');
+
+            if (pageId === 'page1') {
+                p2.classList.remove('page-active');
+                p2.classList.add('page-hidden');
+                p1.classList.remove('page-hidden');
+                p1.classList.add('page-active');
+
+                tab1.className = "px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-gradient-to-r from-pickle-500 to-pickle-600 text-slate-950 shadow-md font-bold";
+                tab2.className = "px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800";
+            } else {
+                p1.classList.remove('page-active');
+                p1.classList.add('page-hidden');
+                p2.classList.remove('page-hidden');
+                p2.classList.add('page-active');
+
+                tab2.className = "px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-gradient-to-r from-pickle-500 to-pickle-600 text-slate-950 shadow-md font-bold";
+                tab1.className = "px-4 py-2 rounded-full font-bubbly text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800";
+
+                updateCustomJar(); // Draw custom jar canvas when tab opens
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* -------------------------------------------------------------
+           5. RENDER CATALOG CARDS & FILTER LOGIC
+        ------------------------------------------------------------- */
+        function renderCatalog() {
+            const grid = document.getElementById('pickleGrid');
+            grid.innerHTML = '';
+
+            const filtered = PRODUCTS.filter(p => {
+                const matchesCategory = state.filterCategory === 'all' || p.category === state.filterCategory;
+                const matchesSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+                                      p.desc.toLowerCase().includes(state.searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-card rounded-3xl space-y-3">
+                        <span class="text-4xl">🔍</span>
+                        <h4 class="font-bubbly text-xl text-white font-bold">No Pickles Match Your Search</h4>
+                        <p class="text-xs text-slate-400">Try adjusting your filters or search keywords</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(p => {
+                let flames = '';
+                for (let i = 0; i < 5; i++) {
+                    flames += i < p.spiceLevel ? '🔥' : '⚪';
+                }
+
+                const cardHtml = `
+                    <div class="glass-card rounded-3xl p-6 border border-slate-800 flex flex-col justify-between group relative overflow-hidden">
+                        <!-- Top Badge -->
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="${p.badgeColor} text-xs font-bubbly font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
+                                ${p.badge}
+                            </span>
+                            <span class="text-xs text-slate-400 flex items-center gap-1 font-semibold">
+                                ★ ${p.rating} <span class="text-[10px]">(${p.reviews})</span>
+                            </span>
+                        </div>
+
+                        <!-- Product Visual Illustration -->
+                        <div class="relative w-full h-48 mb-4 flex items-center justify-center rounded-2xl bg-slate-900/60 border border-white/5 group-hover:border-pickle-500/30 transition-all overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                            <div class="text-7xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(34,197,94,0.3)]">
+                                🥒
+                            </div>
+                            <div class="absolute bottom-2 left-2 text-[10px] bg-slate-950/80 px-2 py-0.5 rounded text-pickle-400 font-mono">
+                                Crunch Index: ${p.crunchFactor}%
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="space-y-2 mb-6">
+                            <h3 class="font-bubbly text-xl font-bold text-white group-hover:text-pickle-400 transition-colors">${p.name}</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">${p.desc}</p>
+                            
+                            <!-- Spice Level Meter -->
+                            <div class="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80">
+                                <span>Heat Meter:</span>
+                                <span class="text-xs tracking-widest">${flames}</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="flex items-center justify-between pt-2">
+                            <div>
+                                <span class="text-xs text-slate-400 block">Price</span>
+                                <span class="font-bubbly text-2xl font-bold text-white">$${p.price.toFixed(2)}</span>
+                            </div>
+                            <button onclick="addToCart(${p.id}); playSynthSound('crunch');" class="bg-gradient-to-r from-pickle-500 to-pickle-600 hover:from-pickle-400 hover:to-pickle-500 text-slate-950 font-bubbly text-sm px-5 py-2.5 rounded-xl font-bold shadow-md shadow-pickle-500/20 active:scale-95 transition-transform flex items-center gap-1.5">
+                                <span>+ Add</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        function setFilter(cat) {
+            state.filterCategory = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700";
+            });
+            const selected = document.getElementById(`filterBtn-${cat}`);
+            if (selected) {
+                selected.className = "filter-btn px-4 py-1.5 rounded-full text-xs font-bubbly font-semibold transition-all bg-pickle-500 text-slate-950 shadow-md font-bold";
+            }
+            playSynthSound('pop');
+            renderCatalog();
+        }
+
+        function filterPickles() {
+            state.searchQuery = document.getElementById('searchInput').value;
+            renderCatalog();
+        }
+
+        /* -------------------------------------------------------------
+           6. CUSTOM JAR BUILDER LAB LOGIC & CANVAS RENDERER
+        ------------------------------------------------------------- */
+        function selectJarSize(size, price) {
+            state.customJar.size = size;
+            state.customJar.basePrice = price;
+            document.querySelectorAll('.size-btn').forEach(b => {
+                b.className = "size-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 text-center hover:border-pickle-500 transition-all";
+            });
+            const btn = document.getElementById(`sizeBtn-${size}`);
+            if (btn) btn.className = "size-btn p-3 rounded-2xl bg-pickle-900/60 border-2 border-pickle-500 text-center transition-all shadow-md";
+            playSynthSound('pop');
+            updateCustomJar();
+        }
+
+        function selectBrine(type, color) {
+            state.customJar.brineType = type;
+            state.customJar.brineColor = color;
+            document.querySelectorAll('.brine-btn').forEach(b => {
+                b.className = "brine-btn p-3 rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-pickle-500 text-center transition-all";
+            });
+            const btn = document.getElementById(`brineBtn-${type}`);
+            if (btn) btn.className = "brine-btn p-3 rounded-2xl bg-pickle-900/60 border-2 border-pickle-500 text-center transition-all shadow-md";
+            playSynthSound('pop');
+            updateCustomJar();
+        }
+
+        function updateCustomJar() {
+            // Read checkboxes
+            const checkboxes = ['chk-garlic', 'chk-chili', 'chk-dill', 'chk-mustard', 'chk-peppercorn'];
+            state.customJar.extras = checkboxes.filter(id => {
+                const el = document.getElementById(id);
+                return el && el.checked;
+            });
+
+            // Read label
+            const labelInput = document.getElementById('customLabelInput');
+            state.customJar.label = labelInput ? (labelInput.value || 'Cosmic Batch') : 'Cosmic Batch';
+
+            // Calculate total price
+            const extrasCost = state.customJar.extras.length * 1.00;
+            const total = state.customJar.basePrice + extrasCost;
+
+            document.getElementById('summarySize').innerText = state.customJar.size;
+            document.getElementById('summaryBasePrice').innerText = `$${state.customJar.basePrice.toFixed(2)}`;
+            document.getElementById('summaryExtrasPrice').innerText = `$${extrasCost.toFixed(2)}`;
+            document.getElementById('summaryTotalPrice').innerText = `$${total.toFixed(2)}`;
+
+            // Redraw Custom Canvas
+            drawJarOnCanvas('customJarCanvas', state.customJar);
+        }
+
+        /* Canvas Jar Drawing Engine */
+        function drawJarOnCanvas(canvasId, jarConfig) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Jar dimensions
+            const jarX = w * 0.2;
+            const jarY = h * 0.22;
+            const jarW = w * 0.6;
+            const jarH = h * 0.7;
+
+            // 1. Draw Liquid Brine Inside Jar
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(jarX + 5, jarY + 15, jarW - 10, jarH - 20, [0, 0, 25, 25]);
+            ctx.clip();
+
+            // Brine Gradient
+            const liquidGrad = ctx.createLinearGradient(0, jarY, 0, jarY + jarH);
+            liquidGrad.addColorStop(0, jarConfig.brineColor + '88');
+            liquidGrad.addColorStop(1, jarConfig.brineColor + 'dd');
+            ctx.fillStyle = liquidGrad;
+            ctx.fillRect(jarX, jarY, jarW, jarH);
+
+            // Draw Floating Pickles inside
+            ctx.font = '36px sans-serif';
+            ctx.fillText('🥒', jarX + jarW * 0.15, jarY + jarH * 0.4);
+            ctx.fillText('🥒', jarX + jarW * 0.5, jarY + jarH * 0.6);
+            ctx.fillText('🥒', jarX + jarW * 0.3, jarY + jarH * 0.8);
+
+            // Draw floating selected extra ingredients
+            if (jarConfig.extras.includes('chk-garlic')) {
+                ctx.font = '24px sans-serif';
+                ctx.fillText('🧄', jarX + jarW * 0.2, jarY + jarH * 0.25);
+                ctx.fillText('🧄', jarX + jarW * 0.65, jarY + jarH * 0.75);
+            }
+            if (jarConfig.extras.includes('chk-chili')) {
+                ctx.font = '24px sans-serif';
+                ctx.fillText('🌶️', jarX + jarW * 0.6, jarY + jarH * 0.3);
+                ctx.fillText('🌶️', jarX + jarW * 0.15, jarY + jarH * 0.65);
+            }
+            if (jarConfig.extras.includes('chk-dill')) {
+                ctx.font = '22px sans-serif';
+                ctx.fillText('🌿', jarX + jarW * 0.4, jarY + jarH * 0.2);
+            }
+            if (jarConfig.extras.includes('chk-mustard')) {
+                ctx.fillStyle = '#facc15';
+                for (let i = 0; i < 12; i++) {
+                    ctx.beginPath();
+                    ctx.arc(jarX + 15 + Math.random() * (jarW - 30), jarY + jarH - 10 - Math.random() * 40, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Rising Bubbles
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath(); ctx.arc(jarX + jarW * 0.25, jarY + jarH * 0.3, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(jarX + jarW * 0.75, jarY + jarH * 0.5, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(jarX + jarW * 0.45, jarY + jarH * 0.7, 3, 0, Math.PI * 2); ctx.fill();
+
+            ctx.restore();
+
+            // 2. Glass Jar Outline & Highlights
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.roundRect(jarX, jarY + 10, jarW, jarH - 10, [10, 10, 30, 30]);
+            ctx.stroke();
+
+            // Glass Glare reflection
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+            ctx.beginPath();
+            ctx.ellipse(jarX + 15, jarY + jarH * 0.5, 6, jarH * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 3. Jar Lid (Metallic Gold / Silver Grid)
+            const lidY = jarY - 15;
+            const lidH = 28;
+            const lidGrad = ctx.createLinearGradient(jarX - 10, 0, jarX + jarW + 10, 0);
+            lidGrad.addColorStop(0, '#71717a');
+            lidGrad.addColorStop(0.5, '#f4f4f5');
+            lidGrad.addColorStop(1, '#52525b');
+
+            ctx.fillStyle = lidGrad;
+            ctx.beginPath();
+            ctx.roundRect(jarX - 8, lidY, jarW + 16, lidH, [8, 8, 4, 4]);
+            ctx.fill();
+            ctx.strokeStyle = '#27272a';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Lid ridges
+            ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            for (let x = jarX - 2; x < jarX + jarW + 4; x += 8) {
+                ctx.beginPath();
+                ctx.moveTo(x, lidY);
+                ctx.lineTo(x, lidY + lidH);
+                ctx.stroke();
+            }
+
+            // 4. Print Custom Front Label
+            const lblW = jarW * 0.82;
+            const lblH = jarH * 0.38;
+            const lblX = jarX + (jarW - lblW) / 2;
+            const lblY = jarY + jarH * 0.38;
+
+            // Paper Label Shadow & Background
+            ctx.fillStyle = '#fffdf0';
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.roundRect(lblX, lblY, lblW, lblH, 8);
+            ctx.fill();
+            ctx.shadowBlur = 0; // Reset
+
+            // Label Border
+            ctx.strokeStyle = '#15803d';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(lblX + 4, lblY + 4, lblW - 8, lblH - 8);
+
+            // Printed Text
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 11px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('COSMIC CRUNCH', lblX + lblW / 2, lblY + 18);
+
+            // Custom User Input Text
+            ctx.fillStyle = '#16a34a';
+            ctx.font = 'bold 13px Outfit, sans-serif';
+            ctx.fillText(jarConfig.label || 'Custom Batch', lblX + lblW / 2, lblY + 36);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(`Batch Size: ${jarConfig.size}`, lblX + lblW / 2, lblY + 50);
+        }
+
+        /* -------------------------------------------------------------
+           7. SHOPPING CART SYSTEM & CHECKOUT
+        ------------------------------------------------------------- */
+        function addToCart(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = state.cart.find(item => item.id === productId && !item.isCustom);
+            if (existing) {
+                existing.qty++;
+            } else {
+                state.cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    qty: 1,
+                    isCustom: false,
+                    color: product.color
+                });
+            }
+
+            updateCartUI();
+            showToast(`Added ${product.name} to Cart! 🥒`, 'success');
+        }
+
+        function addCustomJarToCart() {
+            const extrasCost = state.customJar.extras.length * 1.00;
+            const total = state.customJar.basePrice + extrasCost;
+
+            const customItem = {
+                id: 'custom-' + Date.now(),
+                name: `Custom Jar (${state.customJar.label})`,
+                price: total,
+                qty: 1,
+                isCustom: true,
+                details: `${state.customJar.size} • ${state.customJar.brineType} brine`
+            };
+
+            state.cart.push(customItem);
+            updateCartUI();
+            playSynthSound('crunch');
+            showToast(`Custom Jar Batch Added! 🧪`, 'success');
+            toggleCartDrawer();
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cartItemsList');
+            const badge = document.getElementById('cartBadge');
+            list.innerHTML = '';
+
+            let itemCount = 0;
+            let subtotal = 0;
+
+            if (state.cart.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-10 space-y-2 text-slate-400">
+                        <span class="text-4xl">🥒</span>
+                        <p class="font-bubbly text-sm text-white">Your Cart is Empty!</p>
+                        <p class="text-xs">Explore our catalog or build your custom jar.</p>
+                    </div>
+                `;
+            } else {
+                state.cart.forEach((item, index) => {
+                    itemCount += item.qty;
+                    subtotal += item.price * item.qty;
+
+                    const itemHtml = `
+                        <div class="glass-card p-3 rounded-2xl flex items-center justify-between border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-pickle-900/60 border border-pickle-500/30 flex items-center justify-center text-xl">
+                                    🥒
+                                </div>
+                                <div>
+                                    <h4 class="font-bubbly text-xs font-bold text-white">${item.name}</h4>
+                                    <div class="text-[11px] text-pickle-400 font-semibold">$${item.price.toFixed(2)}</div>
+                                    ${item.details ? `<div class="text-[10px] text-slate-400">${item.details}</div>` : ''}
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center bg-slate-950 rounded-lg border border-slate-800">
+                                    <button onclick="changeQty(${index}, -1)" class="px-2 py-0.5 text-slate-400 hover:text-white text-xs">-</button>
+                                    <span class="px-2 text-xs font-bold text-white">${item.qty}</span>
+                                    <button onclick="changeQty(${index}, 1)" class="px-2 py-0.5 text-slate-400 hover:text-white text-xs">+</button>
+                                </div>
+                                <button onclick="removeItem(${index})" class="text-slate-500 hover:text-chili-500 text-xs p-1">✕</button>
+                            </div>
+                        </div>
+                    `;
+                    list.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            }
+
+            badge.innerText = itemCount;
+
+            // Calculations
+            let discount = 0;
+            if (state.appliedPromo === 'DILL10') {
+                discount = subtotal * 0.10;
+            }
+
+            const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('cartSubtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cartDiscount').innerText = `-$${discount.toFixed(2)}`;
+            document.getElementById('cartTotal').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('checkoutModalTotal').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function changeQty(index, delta) {
+            state.cart[index].qty += delta;
+            if (state.cart[index].qty <= 0) {
+                state.cart.splice(index, 1);
+            }
+            playSynthSound('pop');
+            updateCartUI();
+        }
+
+        function removeItem(index) {
+            state.cart.splice(index, 1);
+            playSynthSound('pop');
+            updateCartUI();
+        }
+
+        function applyPromoCode() {
+            const input = document.getElementById('promoInput');
+            const code = input.value.trim().toUpperCase();
+
+            if (code === 'DILL10') {
+                state.appliedPromo = 'DILL10';
+                showToast('10% Discount Code Applied! 🎉', 'success');
+                playSynthSound('chime');
+                updateCartUI();
+            } else {
+                showToast('Invalid Promo Code', 'error');
+            }
+        }
+
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            const panel = document.getElementById('cartPanel');
+            playSynthSound('pop');
+
+            if (drawer.classList.contains('opacity-0')) {
+                drawer.classList.remove('opacity-0', 'pointer-events-none');
+                panel.classList.remove('translate-x-full');
+            } else {
+                panel.classList.add('translate-x-full');
+                drawer.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function openCheckoutModal() {
+            if (state.cart.length === 0) {
+                showToast('Your cart is empty!', 'info');
+                return;
+            }
+            toggleCartDrawer();
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            playSynthSound('pop');
+        }
+
+        function closeCheckoutModal() {
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function handleCheckoutSubmit(e) {
+            e.preventDefault();
+            playSynthSound('chime');
+
+            // Trigger Confetti Graphics Motion Explosion
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#22c55e', '#39ff14', '#ef4444', '#eab308']
+            });
+
+            document.getElementById('checkoutFormStep').classList.add('hidden');
+            document.getElementById('checkoutSuccessStep').classList.remove('hidden');
+            document.getElementById('orderNumberCode').innerText = `#CC-${Math.floor(10000 + Math.random() * 90000)}`;
+        }
+
+        function finishOrderAndReset() {
+            state.cart = [];
+            state.appliedPromo = null;
+            updateCartUI();
+            closeCheckoutModal();
+            setTimeout(() => {
+                document.getElementById('checkoutFormStep').classList.remove('hidden');
+                document.getElementById('checkoutSuccessStep').classList.add('hidden');
+            }, 400);
+        }
+
+        /* -------------------------------------------------------------
+           8. TOAST NOTIFICATIONS
+        ------------------------------------------------------------- */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            let borderColor = 'border-pickle-500';
+            if (type === 'error') borderColor = 'border-chili-500';
+
+            toast.className = `glass-panel text-white text-xs font-semibold px-4 py-3 rounded-2xl border ${borderColor} shadow-2xl transition-all transform translate-y-4 opacity-0 flex items-center gap-2 pointer-events-auto`;
+            toast.innerHTML = `<span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /* -------------------------------------------------------------
+           9. CANVAS BACKGROUND FLOATING MOTION PARTICLES
+        ------------------------------------------------------------- */
+        function initBackgroundCanvas() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Floating elements
+            const items = ['🥒', '🧄', '🌶️', '🌿', '🫧'];
+            const particles = [];
+
+            for (let i = 0; i < 28; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 20 + 16,
+                    speedY: Math.random() * 0.6 + 0.2,
+                    speedX: Math.sin(Math.random() * Math.PI) * 0.4,
+                    icon: items[Math.floor(Math.random() * items.length)],
+                    opacity: Math.random() * 0.4 + 0.15,
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 0.5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(p => {
+                    p.y -= p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotSpeed;
+
+                    if (p.y < -40) {
+                        p.y = canvas.height + 40;
+                        p.x = Math.random() * canvas.width;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = p.opacity;
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.font = `${p.size}px sans-serif`;
+                    ctx.fillText(p.icon, 0, 0);
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        /* -------------------------------------------------------------
+           10. HERO 3D CARD TILT & INITIALIZATION
+        ------------------------------------------------------------- */
+        function initHeroTilt() {
+            const card = document.getElementById('heroJarCard');
+            if (!card) return;
+
+            window.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                const tiltX = (y / rect.height) * -15;
+                const tiltY = (x / rect.width) * 15;
+
+                card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            });
+        }
+
+        /* -------------------------------------------------------------
+           11. ON LOAD INIT
+        ------------------------------------------------------------- */
+        window.onload = function() {
+            initBackgroundCanvas();
+            renderCatalog();
+            initHeroTilt();
+
+            // Render static Hero Jar Display
+            drawJarOnCanvas('heroJarCanvas', {
+                size: '16oz',
+                brineType: 'spicy',
+                brineColor: '#ef4444',
+                extras: ['chk-garlic', 'chk-chili'],
+                label: 'Inferno Batch'
+            });
+
+            // Initial Custom Jar Render
+            updateCustomJar();
+        };
+    </script>
+</body>
+</html>
